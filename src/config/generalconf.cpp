@@ -2,6 +2,7 @@
 // SPDX-FileCopyrightText: 2017-2019 Alejandro Sirgo Rica & Contributors
 #include "generalconf.h"
 #include "src/core/flameshot.h"
+#include "src/core/flameshotdaemon.h"
 #include "src/utils/confighandler.h"
 #include <QCheckBox>
 #include <QComboBox>
@@ -59,6 +60,7 @@ GeneralConf::GeneralConf(QWidget* parent)
     initUploadClientSecret();
     initPredefinedColorPaletteLarge();
     initShowSelectionGeometry();
+    initOcrServerUrl();
 
     m_layout->addStretch();
 
@@ -111,6 +113,7 @@ void GeneralConf::_updateComponents(bool allowEmptySavePath)
 #if defined(Q_OS_LINUX) || defined(Q_OS_UNIX)
     m_showTray->setChecked(!config.disabledTrayIcon());
 #endif
+    m_ocrServerUrl->setText(config.ocrServerUrl());
 }
 
 void GeneralConf::updateComponents()
@@ -571,6 +574,33 @@ void GeneralConf::initUploadClientSecret()
 void GeneralConf::uploadClientKeyEdited()
 {
     ConfigHandler().setUploadClientSecret(m_uploadClientKey->text());
+}
+
+
+void GeneralConf::initOcrServerUrl()
+{
+    auto* box = new QGroupBox(tr("OCR Server URL"));
+    box->setFlat(true);
+    m_layout->addWidget(box);
+
+    auto* vboxLayout = new QVBoxLayout();
+    box->setLayout(vboxLayout);
+
+    m_ocrServerUrl = new QLineEdit(this);
+    QString foreground = this->palette().windowText().color().name();
+    m_ocrServerUrl->setStyleSheet(QStringLiteral("color: %1").arg(foreground));
+    m_ocrServerUrl->setText(ConfigHandler().ocrServerUrl());
+    connect(m_ocrServerUrl,
+            &QLineEdit::editingFinished,
+            this,
+            &GeneralConf::ocrServerUrlEdited);
+    vboxLayout->addWidget(m_ocrServerUrl);
+}
+
+void GeneralConf::ocrServerUrlEdited()
+{
+    ConfigHandler().setOcrServerUrl(m_ocrServerUrl->text());
+    FlameshotDaemon::updateOcrServerUrl(m_ocrServerUrl->text());
 }
 
 void GeneralConf::uploadHistoryMaxChanged(int max)

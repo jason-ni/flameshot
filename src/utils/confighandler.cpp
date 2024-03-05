@@ -125,7 +125,8 @@ static QMap<class QString, QSharedPointer<ValueHandler>>
     OPTION("uploadClientSecret"          ,String             ( "313baf0c7b4d3ff"            )),
     OPTION("showSelectionGeometry"  , BoundedInt               (0,5,4)),
     OPTION("showSelectionGeometryHideTime", LowerBoundedInt       (0, 3000)),
-    OPTION("jpegQuality", BoundedInt     (0,100,75))
+    OPTION("jpegQuality", BoundedInt     (0,100,75)),
+    OPTION("ocrServerUrl"                ,String              ( "http://127.0.0.1:5000/ocr"))
 };
 
 static QMap<QString, QSharedPointer<KeySequence>> recognizedShortcuts = {
@@ -178,6 +179,7 @@ static QMap<QString, QSharedPointer<KeySequence>> recognizedShortcuts = {
     SHORTCUT("TYPE_SIZEINCREASE"        ,                           ),
     SHORTCUT("TYPE_SIZEDECREASE"        ,                           ),
     SHORTCUT("TYPE_CIRCLECOUNT"         ,                           ),
+    SHORTCUT("TYPE_OCR"                 ,                           ),
 };
 // clang-format on
 

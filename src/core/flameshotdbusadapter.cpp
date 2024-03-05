@@ -25,3 +25,13 @@ void FlameshotDBusAdapter::attachPin(const QByteArray& data)
 {
     FlameshotDaemon::instance()->attachPin(data);
 }
+
+void FlameshotDBusAdapter::attachOcr(const QByteArray& data)
+{
+    FlameshotDaemon::instance()->attachOcr(data);
+}
+
+void FlameshotDBusAdapter::updateOcrServerUrl(const QString& url)
+{
+    FlameshotDaemon::instance()->updateOcrServerUrl(url);
+}

@@ -4,6 +4,7 @@
 #include "confighandler.h"
 #include "flameshot.h"
 #include "pinwidget.h"
+#include "src/tools/ocr/ocrwidget.h"
 #include "screenshotsaver.h"
 #include "src/utils/globalvalues.h"
 #include "src/widgets/capture/capturewidget.h"
@@ -14,8 +15,12 @@
 #include <QDBusMessage>
 #include <QPixmap>
 #include <QRect>
+#include <QNetworkAccessManager>
+#include <QNetworkReply>
+#include <QUrl>
 
 #if !defined(DISABLE_UPDATE_CHECKER)
+#include <QBuffer>
 #include <QDesktopServices>
 #include <QJsonDocument>
 #include <QJsonObject>
@@ -100,10 +105,25 @@ void FlameshotDaemon::start()
 {
     if (!m_instance) {
         m_instance = new FlameshotDaemon();
+
+        // TODO: figure out better way to config ocr server url
+        QByteArray ocrServerUrlRaw = qgetenv("FLAMESHOT_OCR_SERVER");
+        QString url = QString::fromUtf8(ocrServerUrlRaw);
+        if (url.isEmpty()) {
+            ConfigHandler conf = ConfigHandler();
+            url = conf.ocrServerUrl();
+        }
+        m_instance->setOcrServerUrl(url);
         // Tray icon needs FlameshotDaemon::instance() to be non-null
         m_instance->initTrayIcon();
         qApp->setQuitOnLastWindowClosed(false);
     }
+}
+
+void FlameshotDaemon::setOcrServerUrl(const QString& url)
+{
+    m_ocrServerUrl = QUrl(url);
+    qDebug() << "Set ocr server url to: " << m_ocrServerUrl;
 }
 
 void FlameshotDaemon::createPin(const QPixmap& capture, QRect geometry)
@@ -120,6 +140,35 @@ void FlameshotDaemon::createPin(const QPixmap& capture, QRect geometry)
     QDBusMessage m = createMethodCall(QStringLiteral("attachPin"));
     m << data;
     call(m);
+}
+
+void FlameshotDaemon::createOcr(const QPixmap& capture, QRect geometry)
+{
+    if (instance()) {
+        instance()->attachOcr(capture, geometry);
+        return;
+    }
+
+    QByteArray data;
+    QDataStream stream(&data, QIODevice::WriteOnly);
+    stream << capture;
+    stream << geometry;
+    QDBusMessage m = createMethodCall(QStringLiteral("attachOcr"));
+    m << data;
+    call(m);
+}
+
+void FlameshotDaemon::updateOcrServerUrl(const QString& url)
+{
+    if (instance()) {
+        instance()->setOcrServerUrl(url);
+        return;
+    } else {
+        QDBusMessage m = createMethodCall(QStringLiteral("setOcrServerUrl"));
+        m << url;
+        call(m);
+    }
+
 }
 
 void FlameshotDaemon::copyToClipboard(const QPixmap& capture)
@@ -269,6 +318,18 @@ void FlameshotDaemon::attachPin(const QPixmap& pixmap, QRect geometry)
     pinWidget->activateWindow();
 }
 
+void FlameshotDaemon::attachOcr(const QPixmap& pixmap, QRect geometry)
+{
+    auto* ocrWidget = new OcrWidget(pixmap, geometry, m_ocrServerUrl);
+    m_widgets.append(ocrWidget);
+    connect(ocrWidget, &QObject::destroyed, this, [=]() {
+        m_widgets.removeOne(ocrWidget);
+        quitIfIdle();
+    });
+    ocrWidget->show();
+    ocrWidget->activateWindow();
+}
+
 void FlameshotDaemon::attachScreenshotToClipboard(const QPixmap& pixmap)
 {
     m_hostingClipboard = true;
@@ -293,6 +354,18 @@ void FlameshotDaemon::attachPin(const QByteArray& data)
     stream >> geometry;
 
     attachPin(pixmap, geometry);
+}
+
+void FlameshotDaemon::attachOcr(const QByteArray& data)
+{
+    QDataStream stream(data);
+    QPixmap pixmap;
+    QRect geometry;
+
+    stream >> pixmap;
+    stream >> geometry;
+
+    attachOcr(pixmap, geometry);
 }
 
 void FlameshotDaemon::attachScreenshotToClipboard(const QByteArray& screenshot)

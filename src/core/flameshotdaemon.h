@@ -2,6 +2,7 @@
 
 #include <QByteArray>
 #include <QObject>
+#include <QUrl>
 #include <QtDBus/QDBusAbstractAdaptor>
 
 class QPixmap;
@@ -24,6 +25,8 @@ public:
     static void start();
     static FlameshotDaemon* instance();
     static void createPin(const QPixmap& capture, QRect geometry);
+    static void createOcr(const QPixmap& capture, QRect geometry);
+    static void updateOcrServerUrl(const QString& url);
     static void copyToClipboard(const QPixmap& capture);
     static void copyToClipboard(const QString& text,
                                 const QString& notification = "");
@@ -40,6 +43,7 @@ public:
 public slots:
     void checkForUpdates();
     void getLatestAvailableVersion();
+    void setOcrServerUrl(const QString& url);
 
 private slots:
     void handleReplyCheckUpdates(QNetworkReply* reply);
@@ -52,9 +56,11 @@ private:
     FlameshotDaemon();
     void quitIfIdle();
     void attachPin(const QPixmap& pixmap, QRect geometry);
+    void attachOcr(const QPixmap& pixmap, QRect geometry);
     void attachScreenshotToClipboard(const QPixmap& pixmap);
 
     void attachPin(const QByteArray& data);
+    void attachOcr(const QByteArray& data);
     void attachScreenshotToClipboard(const QByteArray& screenshot);
     void attachTextToClipboard(const QString& text,
                                const QString& notification);
@@ -79,6 +85,8 @@ private:
     bool m_showCheckAppUpdateStatus;
     QNetworkAccessManager* m_networkCheckUpdates;
 #endif
+
+    QUrl m_ocrServerUrl;
 
     static FlameshotDaemon* m_instance;
 

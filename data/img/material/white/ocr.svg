@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0" y="0" width="128" height="128" viewBox="0, 0, 128, 128">
+  <g id="图层_1">
+    <g>
+      <path d="M0,0 L12,0 L12,36 L0,36 L0,0 z" fill="#FFFFFF"/>
+      <path d="M0,12 L0,0 L36,0 L36,12 L0,12 z" fill="#FFFFFF"/>
+    </g>
+    <path d="M128,0 L128,12 L92,12 L92,0 L128,0 z" fill="#FFFFFF"/>
+    <path d="M116,0 L128,0 L128,36 L116,36 L116,0 z" fill="#FFFFFF"/>
+    <g>
+      <path d="M128,128 L116,128 L116,92 L128,92 L128,128 z" fill="#FFFFFF"/>
+      <path d="M128,116 L128,128 L92,128 L92,116 L128,116 z" fill="#FFFFFF"/>
+    </g>
+    <g>
+      <path d="M0,128 L0,116 L36,116 L36,128 L0,128 z" fill="#FFFFFF"/>
+      <path d="M12,128 L0,128 L0,92 L12,92 L12,128 z" fill="#FFFFFF"/>
+    </g>
+    <path d="M27.736,54.33 L100.667,54.33 L100.667,70.447 L27.736,70.447 L27.736,54.33 z" fill="#FFFFFF"/>
+  </g>
+</svg>

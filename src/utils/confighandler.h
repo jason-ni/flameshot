@@ -130,7 +130,7 @@ public:
     CONFIG_GETTER_SETTER(showSelectionGeometryHideTime,
                          showSelectionGeometryHideTime,
                          int)
-
+    CONFIG_GETTER_SETTER(ocrServerUrl, setOcrServerUrl, QString)
     // SPECIAL CASES
     bool startupLaunch();
     void setStartupLaunch(const bool);

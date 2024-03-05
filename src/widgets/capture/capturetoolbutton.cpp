@@ -175,7 +175,7 @@ QList<CaptureTool::Type> CaptureToolButton::iterableButtonTypes = {
     CaptureTool::TYPE_MOVESELECTION, CaptureTool::TYPE_UNDO,
     CaptureTool::TYPE_REDO,          CaptureTool::TYPE_COPY,
     CaptureTool::TYPE_SAVE,          CaptureTool::TYPE_EXIT,
-    CaptureTool::TYPE_IMAGEUPLOADER,
+    CaptureTool::TYPE_IMAGEUPLOADER, CaptureTool::TYPE_OCR,
 #if !defined(Q_OS_MACOS)
     CaptureTool::TYPE_OPEN_APP,
 #endif

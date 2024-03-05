@@ -30,6 +30,7 @@
 #include <QApplication>
 #include <QDBusConnection>
 #include <QDBusMessage>
+#include <QUrl>
 #include <desktopinfo.h>
 #endif
 
@@ -144,6 +145,57 @@ int main(int argc, char* argv[])
 #else
         QtSingleApplication app(argc, argv);
 #endif
+        configureApp(true);
+        auto c = Flameshot::instance();
+        FlameshotDaemon::start();
+
+#if !(defined(Q_OS_MACOS) || defined(Q_OS_WIN))
+        new FlameshotDBusAdapter(c);
+        QDBusConnection dbus = QDBusConnection::sessionBus();
+        if (!dbus.isConnected()) {
+            AbstractLogger::error()
+              << QObject::tr("Unable to connect via DBus");
+        }
+        dbus.registerObject(QStringLiteral("/"), c);
+        dbus.registerService(QStringLiteral("org.flameshot.Flameshot"));
+#endif
+        return qApp->exec();
+    }
+
+    if (argc > 1 && QString(argv[1]) == QStringLiteral("ocr")) {
+#ifndef USE_EXTERNAL_SINGLEAPPLICATION
+        SingleApplication app(argc, argv);
+#else
+        QtSingleApplication app(argc, argv);
+#endif
+
+        CommandLineParser ocrParser;
+        CommandArgument ocrArgument(
+          QStringLiteral("ocr"),
+          QObject::tr("Start flameshot in OCR mode."));
+        CommandOption ocrServerUrlOption(
+          { "o", "ocr-server" },
+          QObject::tr("Set the URL of the OCR server"),
+          QStringLiteral("OCR server url"),
+          QStringLiteral("http://127.0.0.1:5000/ocr"));
+
+        const QString ocrServerUrlErr =
+          QObject::tr("Invalid value, it must be valid url format");
+        auto ocrServerUrlChecker = [](const QString& value) -> bool {
+          QUrl const url(value);
+          return url.isValid();
+        };
+        ocrServerUrlOption.addChecker(ocrServerUrlChecker, ocrServerUrlErr);
+        ocrParser.AddArgument(ocrArgument);
+        ocrParser.AddOption(ocrServerUrlOption, ocrArgument);
+
+        if (!ocrParser.parse(qApp->arguments())) {
+            return 0;
+        }
+        qputenv("FLAMESHOT_OCR_SERVER", ocrParser.value(ocrServerUrlOption).toUtf8());
+
+        qDebug() << "Starting flameshot in OCR mode. OCR server: " + ocrParser.value(ocrServerUrlOption);
+
         configureApp(true);
         auto c = Flameshot::instance();
         FlameshotDaemon::start();
@@ -335,7 +387,7 @@ int main(int argc, char* argv[])
                         regionOption,
                         rawImageOption,
                         uploadOption,
-                        pinOption },
+                        pinOption},
                       screenArgument);
     parser.AddOptions({ pathOption,
                         clipboardOption,

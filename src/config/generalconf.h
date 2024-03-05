@@ -58,6 +58,7 @@ private slots:
     void setGeometryLocation(int index);
     void setSelGeoHideTime(int v);
     void setJpegQuality(int v);
+    void ocrServerUrlEdited();
 
 private:
     const QString chooseFolder(const QString& currentPath = "");
@@ -92,6 +93,7 @@ private:
     void initSaveLastRegion();
     void initShowSelectionGeometry();
     void initJpegQuality();
+    void initOcrServerUrl();
 
     void _updateComponents(bool allowEmptySavePath);
 
@@ -121,6 +123,7 @@ private:
     QCheckBox* m_saveAfterCopy;
     QLineEdit* m_savePath;
     QLineEdit* m_uploadClientKey;
+    QLineEdit* m_ocrServerUrl;
     QPushButton* m_changeSaveButton;
     QCheckBox* m_screenshotPathFixedCheck;
     QCheckBox* m_historyConfirmationToDelete;

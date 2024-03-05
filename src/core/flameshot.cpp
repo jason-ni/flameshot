@@ -170,6 +170,7 @@ void Flameshot::screen(CaptureRequest req, const int screenNumber)
         if (req.tasks() & CaptureRequest::PIN) {
             // change geometry for pin task
             req.addPinTask(region);
+            qDebug() << "hello";
         }
         exportCapture(p, geometry, req);
     } else {
@@ -389,6 +390,10 @@ void Flameshot::exportCapture(const QPixmap& capture,
             AbstractLogger::info()
               << QObject::tr("Full screen screenshot pinned to screen");
         }
+    }
+
+    if (tasks & CR::OCR) {
+        FlameshotDaemon::createOcr(capture, selection);
     }
 
     if (tasks & CR::UPLOAD) {
